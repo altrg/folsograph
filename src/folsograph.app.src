@@ -1,0 +1,18 @@
+{application, folsograph,
+ [
+  {description, "feed graphite with folsom metrics"},
+  {vsn, git},
+  {registered, [folsograph_app,
+                folsograph_sup
+               ]},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  folsom
+                 ]},
+  {mod, {folsograph_app, []}},
+  {env, [{graphite_host, "localhost"},
+         {graphite_port, 2003},
+         {graphite_interval, 10000}
+        ]}
+ ]}.
