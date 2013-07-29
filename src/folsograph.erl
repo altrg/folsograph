@@ -51,10 +51,10 @@ code_change(_OldVsn, State, _Extra) -> {ok, State}.
 %%%===================================================================
 send(State) ->
     Metrics = folsom_metrics:get_metrics_info(),
-    gen_udp:send(State#state.socket,
-                 State#state.host,
-                 State#state.port,
-                 format_metrics(Metrics)).
+    [gen_udp:send(State#state.socket,
+                  State#state.host,
+                  State#state.port,
+                  Name++" "++Val++" "++Ts++"\n") || [Name, Val, Ts] <- format_metrics(Metrics)].
 
 %% choose and format metrics to send
 format_metrics([{Name, [{type, Type}]}| Metrics]) when Type == counter; Type == gauge ->
@@ -99,11 +99,11 @@ format_metrics([{Name, [{type, meter_reader}]}| Metrics]) ->
 format_metrics([_| Metrics]) -> format_metrics(Metrics); % 'history' metric skipped here
 format_metrics([]) -> [].
 
-%% "name value timestamp\n"
+%% format name, value, timestamp
 format_metric(Name, Val) ->
-    make_name(Name) ++ " " ++ make_value(Val) ++ " " ++ timestamp() ++ "\n".
+    [make_name(Name), make_value(Val), timestamp()].
 
-%% "name value timestamp\n" using proplist
+%% format name, value, timestamp using proplist
 format_pl_metric(Name, Key, Proplist) ->
     format_metric([Name, Key], proplists:get_value(Key, Proplist)).
 
