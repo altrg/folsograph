@@ -39,7 +39,7 @@ handle_cast(_Msg, State) -> {noreply, State}.
 
 handle_info(_Info, State) ->
     erlang:send_after(State#state.interval, self(), send),
-    send(State),
+    catch send(State), % prevent crash on non-existed methods and send error
     {noreply, State}.
 
 terminate(_Reason, _State) -> ok.
